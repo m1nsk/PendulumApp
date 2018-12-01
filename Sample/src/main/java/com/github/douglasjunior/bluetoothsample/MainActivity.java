@@ -28,6 +28,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -38,20 +39,29 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.esafirm.imagepicker.features.ImagePicker;
+import com.esafirm.imagepicker.model.Image;
 import com.github.douglasjunior.bluetoothclassiclibrary.BluetoothDeviceDecorator;
 import com.github.douglasjunior.bluetoothclassiclibrary.BluetoothService;
 import com.github.douglasjunior.bluetoothclassiclibrary.BluetoothStatus;
+import com.yalantis.ucrop.UCrop;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements BluetoothService.OnBluetoothScanCallback, BluetoothService.OnBluetoothEventCallback, DeviceItemAdapter.OnAdapterItemClickListener {
 
     public static final String TAG = "BluetoothExample";
 
+    private ArrayList<Image> images = new ArrayList<>();
     private ProgressBar pgBar;
+    private Button ipBtn;
     private Menu mMenu;
     private RecyclerView mRecyclerView;
     private DeviceItemAdapter mAdapter;
@@ -69,6 +79,24 @@ public class MainActivity extends AppCompatActivity implements BluetoothService.
 
         pgBar = (ProgressBar) findViewById(R.id.pg_bar);
         pgBar.setVisibility(View.GONE);
+
+        ipBtn = (Button) findViewById(R.id.ip_btn);
+        ipBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                start();
+            }
+        });
+        ipBtn.setVisibility(View.VISIBLE);
+
+        ipBtn = (Button) findViewById(R.id.gallery_btn);
+        ipBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, GalleryActivity.class));
+            }
+        });
+        ipBtn.setVisibility(View.VISIBLE);
 
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
@@ -199,5 +227,23 @@ public class MainActivity extends AppCompatActivity implements BluetoothService.
     @Override
     public void onItemClick(BluetoothDeviceDecorator device, int position) {
         mService.connect(device.getDevice());
+    }
+
+    public void start() {
+        ImagePicker.create(this) // Activity or Fragment
+                .folderMode(true)
+                .limit(15)
+                .showCamera(false)
+                .start();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, final int resultCode, Intent data) {
+        if (ImagePicker.shouldHandle(requestCode, resultCode, data)) {
+            images = (ArrayList<Image>) ImagePicker.getImages(data);
+            return;
+        }
+
+        super.onActivityResult(requestCode, resultCode, data);
     }
 }

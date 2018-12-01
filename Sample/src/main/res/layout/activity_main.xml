@@ -31,6 +31,18 @@
 
         </android.support.v7.widget.Toolbar>
 
+        <Button
+            android:id="@+id/ip_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Button" />
+
+        <Button
+            android:id="@+id/gallery_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Button" />
+
     </android.support.design.widget.AppBarLayout>
 
     <android.support.v7.widget.RecyclerView
