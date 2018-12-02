@@ -7,7 +7,7 @@ android {
     defaultConfig {
 
         applicationId "com.github.douglasjunior.bluetoothsample"
-        minSdkVersion 18
+        minSdkVersion 24
         targetSdkVersion 27
         versionCode 1
         versionName "1.0"
@@ -19,8 +19,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_7
-        targetCompatibility JavaVersion.VERSION_1_7
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 }
 
@@ -48,5 +48,9 @@ dependencies {
     compile 'com.github.yalantis:ucrop:2.2.2'
     implementation 'com.android.support:design:27.1.0'
     compile 'com.android.support:recyclerview-v7:27.1.1'
+
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.8.5'
+    compile 'com.fasterxml.jackson.core:jackson-core:2.8.5'
+    compile 'com.fasterxml.jackson.core:jackson-annotations:2.8.5'
 }
 

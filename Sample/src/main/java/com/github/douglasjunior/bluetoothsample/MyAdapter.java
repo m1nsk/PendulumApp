@@ -1,9 +1,11 @@
 package com.github.douglasjunior.bluetoothsample;
 
+import android.app.Activity;
 import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.DragEvent;
 import android.view.LayoutInflater;
@@ -14,7 +16,9 @@ import android.widget.TextView;
 
 import com.github.douglasjunior.bluetoothsample.helper.ItemTouchHelperAdapter;
 import com.github.douglasjunior.bluetoothsample.helper.OnStartDragListener;
+import com.yalantis.ucrop.UCrop;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -22,11 +26,13 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> implem
     private ArrayList<CreateList> galleryList;
     private Context context;
     private final OnStartDragListener mDragStartListener;
+    private Activity activity;
 
-    public MyAdapter(Context context, ArrayList<CreateList> galleryList, OnStartDragListener dragStartListener) {
+    public MyAdapter(Context context, ArrayList<CreateList> galleryList, OnStartDragListener dragStartListener, Activity activity) {
         mDragStartListener = dragStartListener;
         this.galleryList = galleryList;
         this.context = context;
+        this.activity = activity;
     }
 
     @Override
@@ -44,18 +50,18 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> implem
         viewHolder.img.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(context, CropActivity.class);
-                intent.putExtra("image", galleryList.get(imgId).getImage_location().toString());
-                context.startActivity(intent);
+                String path = galleryList.get(imgId).getImage_location().toString();
+                Uri uri = Uri.fromFile(new File(path));
+                UCrop.of(uri, uri)
+                        .withAspectRatio(180, 100)
+                        .withMaxResultSize(1000, 1000)
+                        .start(activity);
             }
         });
+
         viewHolder.img.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                ClipData data = ClipData.newPlainText("", "");
-                View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(
-                        v);
-                // start dragging the item touched
                 mDragStartListener.onStartDrag(viewHolder);
                 return true;
             }

@@ -24,6 +24,8 @@
 
 package com.github.douglasjunior.bluetoothsample;
 
+import android.content.Intent;
+import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -31,32 +33,40 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 
-import com.github.douglasjunior.bluetoothclassiclibrary.BluetoothService;
+import com.github.douglasjunior.bluetoothsample.device.ImageData;
+import com.github.douglasjunior.bluetoothsample.device.ImageDataImpl;
 import com.github.douglasjunior.bluetoothsample.helper.OnStartDragListener;
 import com.github.douglasjunior.bluetoothsample.helper.SimpleItemTouchHelperCallback;
+import com.yalantis.ucrop.UCrop;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class GalleryActivity extends AppCompatActivity implements OnStartDragListener {
-    private final String image_titles[] = {
-            "/storage/emulated/0/Music/monetochka-raskraski-dlya-vzroslyh/монеточка - Раскраски для взрослых/cover.jpg",
-            "/storage/emulated/0/WhatsApp/Media/WhatsApp Images/IMG-20181107-WA0001.jpg",
-            "/storage/emulated/0/WhatsApp/Media/WhatsApp Images/IMG-20181107-WA0000.jpg"
-    };
+    private List<File> imgList;
     private ItemTouchHelper mItemTouchHelper;
+    private MyAdapter adapter;
+    private RecyclerView recyclerView;
+    private ImageData imageData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        imageData = ImageDataImpl.getInstance();
+        imgList = imageData.getImageList();
+
         setContentView(R.layout.activity_gallery);
 
-        RecyclerView recyclerView = (RecyclerView)findViewById(R.id.imagegallery);
+        recyclerView = (RecyclerView)findViewById(R.id.imagegallery);
         recyclerView.setHasFixedSize(true);
 
-        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getApplicationContext(),2);
+        final int spanCount = 2;
+        final GridLayoutManager layoutManager = new GridLayoutManager(getApplicationContext(), spanCount);
         recyclerView.setLayoutManager(layoutManager);
-        ArrayList<CreateList> createLists = prepareData();
-        MyAdapter adapter = new MyAdapter(getApplicationContext(), createLists, this);
+        List<CreateList> createLists = prepareData();
+        adapter = new MyAdapter(getApplicationContext(), new ArrayList<>(createLists), this, GalleryActivity.this);
         recyclerView.setAdapter(adapter);
 
         ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(adapter);
@@ -64,19 +74,31 @@ public class GalleryActivity extends AppCompatActivity implements OnStartDragLis
         mItemTouchHelper.attachToRecyclerView(recyclerView);
     }
 
-    private ArrayList<CreateList> prepareData(){
-
-        ArrayList<CreateList> theimage = new ArrayList<>();
-        for(int i = 0; i< image_titles.length; i++){
-            CreateList createList = new CreateList();
-            createList.setImage_location(Uri.parse(image_titles[i]));
-            theimage.add(createList);
-        }
-        return theimage;
+    private List<CreateList> prepareData(){
+        return imgList.stream()
+                .map(img -> new CreateList(img.getName(), Uri.parse(img.getPath())))
+                .collect(Collectors.toList());
     }
 
     @Override
     public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
         mItemTouchHelper.startDrag(viewHolder);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_OK && requestCode == UCrop.REQUEST_CROP) {
+            final Uri resultUri = UCrop.getOutput(data);
+            recyclerView.setAdapter(adapter);
+        } else if (resultCode == UCrop.RESULT_ERROR) {
+            final Throwable cropError = UCrop.getError(data);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        imageData.setImageList(imgList);
+        imageData.saveToStorage();
     }
 }

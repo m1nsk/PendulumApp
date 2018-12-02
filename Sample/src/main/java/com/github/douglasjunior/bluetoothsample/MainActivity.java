@@ -48,12 +48,20 @@ import com.esafirm.imagepicker.model.Image;
 import com.github.douglasjunior.bluetoothclassiclibrary.BluetoothDeviceDecorator;
 import com.github.douglasjunior.bluetoothclassiclibrary.BluetoothService;
 import com.github.douglasjunior.bluetoothclassiclibrary.BluetoothStatus;
+import com.github.douglasjunior.bluetoothsample.device.ImageData;
+import com.github.douglasjunior.bluetoothsample.device.ImageDataImpl;
+import com.github.douglasjunior.bluetoothsample.device.Storage;
+import com.github.douglasjunior.bluetoothsample.device.StorageImpl;
 import com.yalantis.ucrop.UCrop;
+import com.yalantis.ucrop.util.FileUtils;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class MainActivity extends AppCompatActivity implements BluetoothService.OnBluetoothScanCallback, BluetoothService.OnBluetoothEventCallback, DeviceItemAdapter.OnAdapterItemClickListener {
 
@@ -69,6 +77,9 @@ public class MainActivity extends AppCompatActivity implements BluetoothService.
     private BluetoothAdapter mBluetoothAdapter;
     private BluetoothService mService;
     private boolean mScanning;
+
+    private Storage storage;
+    private ImageData imageData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,6 +123,10 @@ public class MainActivity extends AppCompatActivity implements BluetoothService.
 
         mService.setOnScanCallback(this);
         mService.setOnEventCallback(this);
+
+        storage = new StorageImpl(getFilesDir());
+        imageData = ImageDataImpl.getInstance();
+        imageData.setStorage(storage);
     }
 
     @Override
@@ -241,6 +256,20 @@ public class MainActivity extends AppCompatActivity implements BluetoothService.
     protected void onActivityResult(int requestCode, final int resultCode, Intent data) {
         if (ImagePicker.shouldHandle(requestCode, resultCode, data)) {
             images = (ArrayList<Image>) ImagePicker.getImages(data);
+            List<File> cachedImages = new ArrayList<>();
+
+            images.forEach(image -> {
+                try {
+                    String location = getCacheDir().getPath() + image.getName();
+                    FileUtils.copyFile(image.getPath(), location);
+                    cachedImages.add(new File(location));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
+            imageData.addToImageList(cachedImages);
+            Intent intent = new Intent(MainActivity.this, GalleryActivity.class);
+            startActivity(intent);
             return;
         }
 

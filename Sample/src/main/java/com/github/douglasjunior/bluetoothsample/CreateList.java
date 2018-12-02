@@ -7,6 +7,11 @@ public class CreateList {
     private String image_title;
     private Uri image_location;
 
+    public CreateList(String image_title, Uri image_location) {
+        this.image_title = image_title;
+        this.image_location = image_location;
+    }
+
     public String getImage_title() {
         return image_title;
     }
