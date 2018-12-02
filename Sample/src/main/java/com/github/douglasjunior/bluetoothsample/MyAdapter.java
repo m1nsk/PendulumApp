@@ -21,14 +21,15 @@ import com.yalantis.ucrop.UCrop;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> implements ItemTouchHelperAdapter {
-    private ArrayList<CreateList> galleryList;
+    private List<File> galleryList;
     private Context context;
     private final OnStartDragListener mDragStartListener;
     private Activity activity;
 
-    public MyAdapter(Context context, ArrayList<CreateList> galleryList, OnStartDragListener dragStartListener, Activity activity) {
+    public MyAdapter(Context context, List<File> galleryList, OnStartDragListener dragStartListener, Activity activity) {
         mDragStartListener = dragStartListener;
         this.galleryList = galleryList;
         this.context = context;
@@ -44,13 +45,13 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> implem
     @Override
     public void onBindViewHolder(final MyAdapter.ViewHolder viewHolder, int i) {
         final int imgId = i;
-        viewHolder.title.setText(galleryList.get(i).getImage_title());
+        viewHolder.title.setText(galleryList.get(i).getName());
         viewHolder.img.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        viewHolder.img.setImageURI((galleryList.get(i).getImage_location()));
+        viewHolder.img.setImageURI(Uri.parse(galleryList.get(i).getPath()));
         viewHolder.img.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String path = galleryList.get(imgId).getImage_location().toString();
+                String path = galleryList.get(imgId).getPath();
                 Uri uri = Uri.fromFile(new File(path));
                 UCrop.of(uri, uri)
                         .withAspectRatio(180, 100)

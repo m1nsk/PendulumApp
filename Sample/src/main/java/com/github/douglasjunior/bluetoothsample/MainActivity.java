@@ -28,7 +28,6 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -48,20 +47,16 @@ import com.esafirm.imagepicker.model.Image;
 import com.github.douglasjunior.bluetoothclassiclibrary.BluetoothDeviceDecorator;
 import com.github.douglasjunior.bluetoothclassiclibrary.BluetoothService;
 import com.github.douglasjunior.bluetoothclassiclibrary.BluetoothStatus;
-import com.github.douglasjunior.bluetoothsample.device.ImageData;
-import com.github.douglasjunior.bluetoothsample.device.ImageDataImpl;
+import com.github.douglasjunior.bluetoothsample.device.Device;
 import com.github.douglasjunior.bluetoothsample.device.Storage;
 import com.github.douglasjunior.bluetoothsample.device.StorageImpl;
-import com.yalantis.ucrop.UCrop;
 import com.yalantis.ucrop.util.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class MainActivity extends AppCompatActivity implements BluetoothService.OnBluetoothScanCallback, BluetoothService.OnBluetoothEventCallback, DeviceItemAdapter.OnAdapterItemClickListener {
 
@@ -78,8 +73,8 @@ public class MainActivity extends AppCompatActivity implements BluetoothService.
     private BluetoothService mService;
     private boolean mScanning;
 
-    private Storage storage;
-    private ImageData imageData;
+    private Storage storage = new StorageImpl(getFilesDir());
+    private Device device = new Device();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -124,9 +119,7 @@ public class MainActivity extends AppCompatActivity implements BluetoothService.
         mService.setOnScanCallback(this);
         mService.setOnEventCallback(this);
 
-        storage = new StorageImpl(getFilesDir());
-        imageData = ImageDataImpl.getInstance();
-        imageData.setStorage(storage);
+        device.setStorage(storage);
     }
 
     @Override
@@ -267,12 +260,18 @@ public class MainActivity extends AppCompatActivity implements BluetoothService.
                     e.printStackTrace();
                 }
             });
-            imageData.addToImageList(cachedImages);
+            device.addToImageList(cachedImages);
             Intent intent = new Intent(MainActivity.this, GalleryActivity.class);
             startActivity(intent);
             return;
         }
 
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        device.saveToStorage();
     }
 }

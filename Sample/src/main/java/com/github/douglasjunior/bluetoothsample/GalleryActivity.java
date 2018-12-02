@@ -25,7 +25,6 @@
 package com.github.douglasjunior.bluetoothsample;
 
 import android.content.Intent;
-import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -33,29 +32,30 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 
-import com.github.douglasjunior.bluetoothsample.device.ImageData;
-import com.github.douglasjunior.bluetoothsample.device.ImageDataImpl;
+import com.github.douglasjunior.bluetoothsample.device.Device;
+import com.github.douglasjunior.bluetoothsample.device.Storage;
+import com.github.douglasjunior.bluetoothsample.device.StorageImpl;
 import com.github.douglasjunior.bluetoothsample.helper.OnStartDragListener;
 import com.github.douglasjunior.bluetoothsample.helper.SimpleItemTouchHelperCallback;
 import com.yalantis.ucrop.UCrop;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class GalleryActivity extends AppCompatActivity implements OnStartDragListener {
     private List<File> imgList;
     private ItemTouchHelper mItemTouchHelper;
     private MyAdapter adapter;
     private RecyclerView recyclerView;
-    private ImageData imageData;
+
+    private Storage storage = new StorageImpl(getFilesDir());
+    private Device device = new Device();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        imageData = ImageDataImpl.getInstance();
-        imgList = imageData.getImageList();
+        device.setStorage(storage);
+        imgList = device.getImageList();
 
         setContentView(R.layout.activity_gallery);
 
@@ -65,19 +65,12 @@ public class GalleryActivity extends AppCompatActivity implements OnStartDragLis
         final int spanCount = 2;
         final GridLayoutManager layoutManager = new GridLayoutManager(getApplicationContext(), spanCount);
         recyclerView.setLayoutManager(layoutManager);
-        List<CreateList> createLists = prepareData();
-        adapter = new MyAdapter(getApplicationContext(), new ArrayList<>(createLists), this, GalleryActivity.this);
+        adapter = new MyAdapter(getApplicationContext(), imgList, this, GalleryActivity.this);
         recyclerView.setAdapter(adapter);
 
         ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(adapter);
         mItemTouchHelper = new ItemTouchHelper(callback);
         mItemTouchHelper.attachToRecyclerView(recyclerView);
-    }
-
-    private List<CreateList> prepareData(){
-        return imgList.stream()
-                .map(img -> new CreateList(img.getName(), Uri.parse(img.getPath())))
-                .collect(Collectors.toList());
     }
 
     @Override
@@ -98,7 +91,7 @@ public class GalleryActivity extends AppCompatActivity implements OnStartDragLis
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        imageData.setImageList(imgList);
-        imageData.saveToStorage();
+        device.setImageList(imgList);
+        device.saveToStorage();
     }
 }
