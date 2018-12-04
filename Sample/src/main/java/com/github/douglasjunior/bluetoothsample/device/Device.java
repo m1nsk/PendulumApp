@@ -2,70 +2,96 @@ package com.github.douglasjunior.bluetoothsample.device;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Device implements ImageData, PropsData {
-    Storage storage;
-    DeviceData deviceData;
+    private static final Integer LED_NUM = 144;
+    private static final Integer BRIGHTNESS = 100;
+    private static volatile Device instance;
+    private Storage<List<File>> imageStorage;
+    private Storage<Map<String, String>> propsStorage;
+    private Map<String, String> props = new HashMap<>();
+    private List<File> images = new ArrayList<>();
 
-    @Override
-    public void setStorage(Storage storage) {
-        this.storage = storage;
-        this.deviceData = DeviceData.getInstance();
-        refreshData();
+    private Device() {
+    }
+
+    public static Device getInstance(){
+        Device localInstance = instance;
+        if (localInstance == null) {
+            synchronized (Device.class) {
+                localInstance = instance;
+                if (localInstance == null) {
+                    instance = localInstance = new Device();
+                }
+            }
+        }
+        try {
+            if(localInstance.imageStorage != null && localInstance.propsStorage != null)
+                localInstance.loadFromStorage();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return localInstance;
+    }
+
+    public void setStorage(File file) throws IOException {
+        imageStorage = new StorageImageImpl(file);
+        propsStorage = new StoragePropsImpl(file);
+        loadFromStorage();
+    }
+
+    private void loadFromStorage() throws IOException {
+        images = imageStorage.loadData();
+        props = propsStorage.loadData();
     }
 
     @Override
     public List<File> getImageList() {
-        return deviceData.getImages();
+        return images;
     }
 
     @Override
-    public void setImageList(List<File> list) {
-        deviceData.setImages(list);
+    public void setImageList(List<File> images) {
+        this.images = images;
+    }
+
+
+    @Override
+    public void setLedNum(Integer value) {
+        props.put("ledNum", value.toString());
     }
 
     @Override
-    public void addToImageList(List<File> list) {
-        deviceData.addToImageList(list);
-    }
-
-    @Override
-    public void setLedNum(Integer ledNum) {
-        deviceData.setLedNum(ledNum);
-    }
-
-    @Override
-    public void setBrightness(Integer percent) {
-        deviceData.setBrightness(percent);
+    public void setBrightness(Integer value) {
+        if(value > 100)
+            value = 100;
+        if(value < 0)
+            value = 0;
+        props.put("brightness", value.toString());
     }
 
     @Override
     public Integer getLedNum() {
-        return deviceData.getLedNum();
+        return Integer.parseInt(props.getOrDefault("ledNum", LED_NUM.toString()));
     }
 
     @Override
     public Integer getBrightness() {
-        return deviceData.getBrightness();
+        return Integer.parseInt(props.getOrDefault("brightness", BRIGHTNESS.toString()));
     }
 
     @Override
-    public void refreshData() {
-        try {
-            deviceData.clear();
-            storage.loadData();
-        } catch (IOException e) {
-            deviceData.clear();
-        }
+    public void saveToStorage() throws IOException {
+            imageStorage.storeData(images);
+            propsStorage.storeData(props);
     }
 
     @Override
-    public void saveToStorage() {
-        try {
-            storage.storeData(deviceData);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public void addToImageList(List<File> cachedImages) {
+        this.images.addAll(cachedImages);
     }
 }

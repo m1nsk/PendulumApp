@@ -1,17 +1,16 @@
 package com.github.douglasjunior.bluetoothsample.device;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 public interface ImageData {
-    void setStorage(Storage storage);
 
     List<File> getImageList();
+
     void setImageList(List<File> list);
 
-    void addToImageList(List<File> list);
+    void saveToStorage() throws IOException;
 
-    void refreshData();
-
-    void saveToStorage();
+    void addToImageList(List<File> cachedImages);
 }

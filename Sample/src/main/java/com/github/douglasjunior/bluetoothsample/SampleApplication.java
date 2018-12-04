@@ -57,7 +57,7 @@ public class SampleApplication extends Application {
         config.context = getApplicationContext();
         config.bufferSize = 1024;
         config.characterDelimiter = '\n';
-        config.deviceName = "Bluetooth Sample";
+        config.deviceName = "Big Fucking Stick";
         config.callListenersInMainThread = true;
 
         //config.uuid = null; // When using BluetoothLeService.class set null to show all devices on scan.

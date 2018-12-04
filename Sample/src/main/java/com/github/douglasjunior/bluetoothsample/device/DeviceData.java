@@ -2,6 +2,7 @@ package com.github.douglasjunior.bluetoothsample.device;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -11,23 +12,17 @@ import lombok.Setter;
 @Getter
 @Setter
 public class DeviceData{
-    private static DeviceData instance;
     private static final Integer LED_NUM = 144;
     private static final Integer BRIGHTNESS = 100;
-    private Map<String, String> props;
+    private Map<String, String> props = new HashMap<>();
     private List<File> images = new ArrayList<>();
 
-    private DeviceData() {
+    public DeviceData() {
     }
 
-    public static DeviceData getInstance(){
-        if(instance == null)
-            instance = new DeviceData();
-        return instance;
-    }
 
     public void addToImageList(List<File> images) {
-        images.addAll(images);
+        this.images.addAll(images);
     }
 
     public Integer getLedNum() {

@@ -23,25 +23,36 @@
 
             <ProgressBar
                 android:id="@+id/pg_bar"
+                style="@android:style/Widget.Material.ProgressBar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:indeterminate="true"
 
-                android:layout_gravity="right" />
+                android:layout_gravity="right"
+                android:indeterminate="true" />
 
         </android.support.v7.widget.Toolbar>
 
-        <Button
-            android:id="@+id/ip_btn"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Button" />
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
 
-        <Button
-            android:id="@+id/gallery_btn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Button" />
+            <Button
+                android:id="@+id/gallery_btn"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Gallery" />
+
+            <Button
+                android:id="@+id/ip_btn"
+                style="@android:style/Widget.Material.Button.Borderless"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Options" />
+        </LinearLayout>
 
     </android.support.design.widget.AppBarLayout>
 

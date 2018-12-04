@@ -1,10 +1,15 @@
 package com.github.douglasjunior.bluetoothsample.device;
 
+import java.io.IOException;
+
 public interface PropsData {
     void setLedNum(Integer ledNum);
+
     void setBrightness(Integer percents);
+
     Integer getLedNum();
+
     Integer getBrightness();
-    void refreshData();
-    void saveToStorage();
+
+    void saveToStorage() throws IOException;
 }

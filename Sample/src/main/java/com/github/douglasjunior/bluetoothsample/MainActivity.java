@@ -48,8 +48,6 @@ import com.github.douglasjunior.bluetoothclassiclibrary.BluetoothDeviceDecorator
 import com.github.douglasjunior.bluetoothclassiclibrary.BluetoothService;
 import com.github.douglasjunior.bluetoothclassiclibrary.BluetoothStatus;
 import com.github.douglasjunior.bluetoothsample.device.Device;
-import com.github.douglasjunior.bluetoothsample.device.Storage;
-import com.github.douglasjunior.bluetoothsample.device.StorageImpl;
 import com.yalantis.ucrop.util.FileUtils;
 
 import java.io.File;
@@ -73,8 +71,7 @@ public class MainActivity extends AppCompatActivity implements BluetoothService.
     private BluetoothService mService;
     private boolean mScanning;
 
-    private Storage storage = new StorageImpl(getFilesDir());
-    private Device device = new Device();
+    private Device device;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,7 +87,7 @@ public class MainActivity extends AppCompatActivity implements BluetoothService.
         ipBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                start();
+                return;
             }
         });
         ipBtn.setVisibility(View.VISIBLE);
@@ -119,7 +116,13 @@ public class MainActivity extends AppCompatActivity implements BluetoothService.
         mService.setOnScanCallback(this);
         mService.setOnEventCallback(this);
 
-        device.setStorage(storage);
+        try {
+            device = Device.getInstance();
+            device.setStorage(getFilesDir());
+        } catch (IOException e) {
+            Toast toast = Toast.makeText(getApplicationContext(), "storage failure", Toast.LENGTH_SHORT);
+            toast.show();
+        }
     }
 
     @Override
@@ -263,7 +266,6 @@ public class MainActivity extends AppCompatActivity implements BluetoothService.
             device.addToImageList(cachedImages);
             Intent intent = new Intent(MainActivity.this, GalleryActivity.class);
             startActivity(intent);
-            return;
         }
 
         super.onActivityResult(requestCode, resultCode, data);
@@ -272,6 +274,11 @@ public class MainActivity extends AppCompatActivity implements BluetoothService.
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        device.saveToStorage();
+        try {
+            device.saveToStorage();
+        } catch (IOException e) {
+            Toast toast = Toast.makeText(getApplicationContext(), "storage failure", Toast.LENGTH_SHORT);
+            toast.show();
+        }
     }
 }

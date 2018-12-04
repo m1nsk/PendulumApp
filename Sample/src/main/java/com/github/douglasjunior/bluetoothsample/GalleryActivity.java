@@ -31,15 +31,21 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.view.View;
+import android.widget.Button;
+import android.widget.Toast;
 
+import com.esafirm.imagepicker.features.ImagePicker;
+import com.esafirm.imagepicker.model.Image;
 import com.github.douglasjunior.bluetoothsample.device.Device;
-import com.github.douglasjunior.bluetoothsample.device.Storage;
-import com.github.douglasjunior.bluetoothsample.device.StorageImpl;
 import com.github.douglasjunior.bluetoothsample.helper.OnStartDragListener;
 import com.github.douglasjunior.bluetoothsample.helper.SimpleItemTouchHelperCallback;
 import com.yalantis.ucrop.UCrop;
+import com.yalantis.ucrop.util.FileUtils;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class GalleryActivity extends AppCompatActivity implements OnStartDragListener {
@@ -47,14 +53,14 @@ public class GalleryActivity extends AppCompatActivity implements OnStartDragLis
     private ItemTouchHelper mItemTouchHelper;
     private MyAdapter adapter;
     private RecyclerView recyclerView;
+    private Button addImagesBtn;
 
-    private Storage storage = new StorageImpl(getFilesDir());
-    private Device device = new Device();
+    private Device device;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        device.setStorage(storage);
+        device = Device.getInstance();
         imgList = device.getImageList();
 
         setContentView(R.layout.activity_gallery);
@@ -71,6 +77,17 @@ public class GalleryActivity extends AppCompatActivity implements OnStartDragLis
         ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(adapter);
         mItemTouchHelper = new ItemTouchHelper(callback);
         mItemTouchHelper.attachToRecyclerView(recyclerView);
+
+        addImagesBtn = (Button) findViewById(R.id.btn_add_images);
+        addImagesBtn.setOnClickListener(v -> start());
+    }
+
+    public void start() {
+        ImagePicker.create(this)
+                .folderMode(true)
+                .limit(15)
+                .showCamera(false)
+                .start();
     }
 
     @Override
@@ -79,19 +96,35 @@ public class GalleryActivity extends AppCompatActivity implements OnStartDragLis
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == RESULT_OK && requestCode == UCrop.REQUEST_CROP) {
-            final Uri resultUri = UCrop.getOutput(data);
-            recyclerView.setAdapter(adapter);
-        } else if (resultCode == UCrop.RESULT_ERROR) {
-            final Throwable cropError = UCrop.getError(data);
+    protected void onActivityResult(int requestCode, final int resultCode, Intent data) {
+        if (ImagePicker.shouldHandle(requestCode, resultCode, data)) {
+            ArrayList<Image> images = (ArrayList<Image>) ImagePicker.getImages(data);
+            List<File> cachedImages = new ArrayList<>();
+
+            images.forEach(image -> {
+                try {
+                    String location = getCacheDir().getPath() + image.getName();
+                    FileUtils.copyFile(image.getPath(), location);
+                    cachedImages.add(new File(location));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
+            device.addToImageList(cachedImages);
         }
+        recyclerView.setAdapter(adapter);
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         device.setImageList(imgList);
-        device.saveToStorage();
+        try {
+            device.saveToStorage();
+        } catch (IOException e) {
+            Toast toast = Toast.makeText(getApplicationContext(), "storage failure", Toast.LENGTH_SHORT);
+            toast.show();
+        }
     }
 }

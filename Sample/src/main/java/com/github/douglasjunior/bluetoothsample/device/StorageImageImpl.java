@@ -1,6 +1,5 @@
 package com.github.douglasjunior.bluetoothsample.device;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
@@ -13,49 +12,38 @@ import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
-public class StorageImpl implements Storage {
-    DeviceData deviceData = DeviceData.getInstance();
-    private File storage;
-    private static final String DEVICE = "device";
-    private ObjectMapper objectMapper;
+public class StorageImageImpl implements Storage<List<File>> {
+    private final String DEVICE = "device";
+    private final File imgDir;
+    private ObjectMapper objectMapper = new ObjectMapper();
 
-    public StorageImpl(File storage) {
-        this.storage = storage;
-        objectMapper = new ObjectMapper();
+    public StorageImageImpl(File storage) {
+        imgDir = new File(storage.getPath() + "/" + DEVICE);
+        if(!imgDir.exists()) {
+            imgDir.mkdir();
+        }
     }
 
     @Override
-    public void loadData() throws IOException {
-        File imagesFile = new File(storage.getPath() + "/" + DEVICE + "/images.txt");
-        File propsFile = new File(storage.getPath() + "/" + DEVICE + "/props.txt");
+    public List<File> loadData() throws IOException {
+        return loadImages();
+    }
+
+    private List<File> loadImages() throws IOException {
+        File imagesFile = new File(imgDir + "/images.txt");
         List<String> imageList = new ArrayList<>(Arrays.asList(objectMapper.readValue(imagesFile, String[].class)));
-        Map<String, String> props = objectMapper.readValue(propsFile, new TypeReference<Map<String, String>>(){});
         List<File> images = imageList.stream().map(File::new).collect(Collectors.toList());
-        deviceData.setImages(images);
-        deviceData.setProps(props);
-
+        return images;
     }
 
     @Override
-    public void storeData(DeviceData data) throws IOException {
-        saveProps(data.getProps());
-        saveImages(data.getImages());
+    public void storeData(List<File> data) throws IOException {
+        saveImages(data);
     }
-
-    private void saveProps(Map<String, String> props) throws IOException {
-        String imgDir = storage.getPath() + "/" + DEVICE;
-        File file = new File(imgDir + "/props.txt");
-        ObjectWriter writer = objectMapper.writer(new DefaultPrettyPrinter());
-        writer.writeValue(file, props);
-    }
-
 
     private void saveImages(List<File> images) throws IOException {
-        String imgDir = storage.getPath() + "/" + DEVICE;
-        new File(imgDir).mkdir();
         for (File item : images) {
             File file = new File(imgDir + "/" + item.getName());
             copy(item, file);

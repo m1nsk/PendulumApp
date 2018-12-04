@@ -44,14 +44,13 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> implem
 
     @Override
     public void onBindViewHolder(final MyAdapter.ViewHolder viewHolder, int i) {
-        final int imgId = i;
+        final String path = galleryList.get(i).getPath();
         viewHolder.title.setText(galleryList.get(i).getName());
         viewHolder.img.setScaleType(ImageView.ScaleType.CENTER_CROP);
         viewHolder.img.setImageURI(Uri.parse(galleryList.get(i).getPath()));
         viewHolder.img.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String path = galleryList.get(imgId).getPath();
                 Uri uri = Uri.fromFile(new File(path));
                 UCrop.of(uri, uri)
                         .withAspectRatio(180, 100)
