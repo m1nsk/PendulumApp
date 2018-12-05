@@ -240,14 +240,6 @@ public class MainActivity extends AppCompatActivity implements BluetoothService.
         mService.connect(device.getDevice());
     }
 
-    public void start() {
-        ImagePicker.create(this) // Activity or Fragment
-                .folderMode(true)
-                .limit(15)
-                .showCamera(false)
-                .start();
-    }
-
     @Override
     protected void onActivityResult(int requestCode, final int resultCode, Intent data) {
         if (ImagePicker.shouldHandle(requestCode, resultCode, data)) {

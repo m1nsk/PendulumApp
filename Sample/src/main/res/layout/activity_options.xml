@@ -43,16 +43,6 @@
                     android:inputType="textPersonName"
                     android:text="Brightness" />
 
-                <SeekBar
-                    android:id="@+id/brightness"
-                    style="@android:style/Widget.Material.SeekBar"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:max="1440"
-                    android:progress="144"
-                    android:thumb="0" />
-
             </TableRow>
 
             <TableRow
