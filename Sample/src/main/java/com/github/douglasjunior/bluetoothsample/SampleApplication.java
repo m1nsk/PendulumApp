@@ -57,7 +57,7 @@ public class SampleApplication extends Application {
         config.context = getApplicationContext();
         config.bufferSize = 1024;
         config.characterDelimiter = '\n';
-        config.deviceName = "Big Fucking Stick";
+        config.deviceName = "Bluetooth Sample";
         config.callListenersInMainThread = true;
 
         //config.uuid = null; // When using BluetoothLeService.class set null to show all devices on scan.
@@ -68,7 +68,7 @@ public class SampleApplication extends Application {
         config.transport = BluetoothDevice.TRANSPORT_LE; // Only for dual-mode devices
 
         // For BLE
-        config.connectionPriority = BluetoothGatt.CONNECTION_PRIORITY_HIGH; // Automatically request connection priority just after connection is through.
+//        config.connectionPriority = BluetoothGatt.CONNECTION_PRIORITY_HIGH; // Automatically request connection priority just after connection is through.
         //or request connection priority manually, mService.requestConnectionPriority(BluetoothGatt.CONNECTION_PRIORITY_HIGH);
 
         BluetoothService.init(config);

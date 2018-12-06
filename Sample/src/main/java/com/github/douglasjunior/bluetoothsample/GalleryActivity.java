@@ -96,6 +96,11 @@ public class GalleryActivity extends AppCompatActivity implements OnStartDragLis
     }
 
     @Override
+    public void onRemove(RecyclerView.ViewHolder viewHolder) {
+        viewHolder.getItemId();
+    }
+
+    @Override
     protected void onActivityResult(int requestCode, final int resultCode, Intent data) {
         if (ImagePicker.shouldHandle(requestCode, resultCode, data)) {
             ArrayList<Image> images = (ArrayList<Image>) ImagePicker.getImages(data);
@@ -127,4 +132,6 @@ public class GalleryActivity extends AppCompatActivity implements OnStartDragLis
             toast.show();
         }
     }
+
+
 }

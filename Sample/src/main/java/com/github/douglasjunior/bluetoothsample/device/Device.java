@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Map;
 
 public class Device implements ImageData, PropsData {
-    private static final Integer LED_NUM = 144;
-    private static final Integer BRIGHTNESS = 100;
+    private static final Integer LED_NUM = 5;
+    private static final Integer BRIGHTNESS = 5;
     private static volatile Device instance;
     private Storage<List<File>> imageStorage;
     private Storage<Map<String, String>> propsStorage;

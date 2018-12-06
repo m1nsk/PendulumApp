@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.net.Uri;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.view.DragEvent;
 import android.view.LayoutInflater;
@@ -48,23 +49,27 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> implem
         viewHolder.title.setText(galleryList.get(i).getName());
         viewHolder.img.setScaleType(ImageView.ScaleType.CENTER_CROP);
         viewHolder.img.setImageURI(Uri.parse(galleryList.get(i).getPath()));
-        viewHolder.img.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Uri uri = Uri.fromFile(new File(path));
-                UCrop.of(uri, uri)
-                        .withAspectRatio(180, 100)
-                        .withMaxResultSize(1000, 1000)
-                        .start(activity);
-            }
-        });
+        viewHolder.img.setOnClickListener(v -> {
+            CharSequence colors[] = new CharSequence[]{"crop", "remove", "cancel"};
 
-        viewHolder.img.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                mDragStartListener.onStartDrag(viewHolder);
-                return true;
-            }
+            AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+            builder.setTitle("Select");
+            builder.setItems(colors, (dialog, which) -> {
+                if (which == 0) {
+                    Uri uri = Uri.fromFile(new File(path));
+                    UCrop.of(uri, uri)
+                            .withAspectRatio(200, 100)
+                            .withMaxResultSize(2000, 1000)
+                            .start(activity);
+                } else if(which == 1){
+                    galleryList.remove(viewHolder.getLayoutPosition());
+                    notifyItemRemoved(viewHolder.getLayoutPosition());
+                } else {
+                    return;
+                }
+            });
+            builder.setCancelable(false);
+            builder.show();
         });
     }
 

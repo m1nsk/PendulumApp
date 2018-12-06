@@ -17,7 +17,7 @@
             style="@android:style/Widget.Material.Button.Borderless"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Add images" />
+            android:text="Save Properties" />
 
     </android.support.design.widget.AppBarLayout>
 
@@ -32,62 +32,85 @@
 
             <TableRow
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" >
+                android:layout_height="61dp">
 
-                <EditText
-                    android:id="@+id/editText2"
-                    android:layout_width="11dp"
+                <LinearLayout
+                    android:layout_width="31dp"
                     android:layout_height="match_parent"
                     android:layout_weight="0.3"
-                    android:ems="10"
-                    android:inputType="textPersonName"
-                    android:text="Brightness" />
+                    android:orientation="vertical">
 
-            </TableRow>
+                    <TextView
+                        android:id="@+id/b_value"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.3"
+                        android:ems="10"
+                        android:inputType="none"
+                        android:text="Brightness" />
 
-            <TableRow
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" >
+                    <TextView
+                        android:id="@+id/b_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.3"
+                        android:ems="10"
+                        android:inputType="none" />
 
-                <EditText
-                    android:id="@+id/editText"
-                    android:layout_width="11dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="0.3"
-                    android:ems="10"
-                    android:inputType="textPersonName"
-                    android:text="Name" />
+                </LinearLayout>
 
                 <SeekBar
-                    android:id="@+id/seekBar"
-                    android:layout_width="match_parent"
+                    android:id="@+id/seek_brightness"
+                    style="@style/Widget.AppCompat.SeekBar.Discrete"
+                    android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:layout_weight="1" />
+                    android:layout_weight="1"
+                    android:max="10"
+                    android:progress="5" />
 
             </TableRow>
 
             <TableRow
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent" >
 
-            <TableRow
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                <LinearLayout
+                    android:layout_width="45dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.3"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/l_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.3"
+                        android:ems="10"
+                        android:inputType="none"
+                        android:text="LedNum" />
+
+                    <TextView
+                        android:id="@+id/l_value"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.3"
+                        android:ems="10"
+                        android:inputType="none" />
+
+                </LinearLayout>
+
+                <SeekBar
+                    android:id="@+id/seek_led_num"
+                    style="@style/Widget.AppCompat.SeekBar.Discrete"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:max="10"
+                    android:progress="5" />
+
+            </TableRow>
+
         </TableLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-        </LinearLayout>
 
     </LinearLayout>
 

@@ -26,7 +26,6 @@ package com.github.douglasjunior.bluetoothsample;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
@@ -47,14 +46,19 @@ import com.esafirm.imagepicker.model.Image;
 import com.github.douglasjunior.bluetoothclassiclibrary.BluetoothDeviceDecorator;
 import com.github.douglasjunior.bluetoothclassiclibrary.BluetoothService;
 import com.github.douglasjunior.bluetoothclassiclibrary.BluetoothStatus;
+import com.github.douglasjunior.bluetoothsample.ImageUtils.ImageUtils;
 import com.github.douglasjunior.bluetoothsample.device.Device;
+import com.github.douglasjunior.bluetoothsample.device.DeviceData;
+import com.github.douglasjunior.bluetoothsample.device.DeviceDataConverter;
 import com.yalantis.ucrop.util.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements BluetoothService.OnBluetoothScanCallback, BluetoothService.OnBluetoothEventCallback, DeviceItemAdapter.OnAdapterItemClickListener {
 
@@ -84,21 +88,11 @@ public class MainActivity extends AppCompatActivity implements BluetoothService.
         pgBar.setVisibility(View.GONE);
 
         ipBtn = (Button) findViewById(R.id.ip_btn);
-        ipBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                return;
-            }
-        });
+        ipBtn.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, PropertiesActivity.class)));
         ipBtn.setVisibility(View.VISIBLE);
 
         ipBtn = (Button) findViewById(R.id.gallery_btn);
-        ipBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, GalleryActivity.class));
-            }
-        });
+        ipBtn.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, GalleryActivity.class)));
         ipBtn.setVisibility(View.VISIBLE);
 
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -200,24 +194,44 @@ public class MainActivity extends AppCompatActivity implements BluetoothService.
         Toast.makeText(this, status.toString(), Toast.LENGTH_SHORT).show();
 
         if (status == BluetoothStatus.CONNECTED) {
-            CharSequence colors[] = new CharSequence[]{"Try text", "Try picture"};
+            CharSequence colors[] = new CharSequence[]{"Synchronize"};
 
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("Select");
-            builder.setItems(colors, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    if (which == 0) {
-                        startActivity(new Intent(MainActivity.this, DeviceActivity.class));
-                    } else {
-                        startActivity(new Intent(MainActivity.this, BitmapActivity.class));
+            builder.setItems(colors, (dialog, which) -> {
+                if (which == 0) {
+                    byte[] data = new byte[0];
+                    try {
+                        data = prepareSendData(this.device);
+                    } catch (IOException e) {
+                        Toast toast = Toast.makeText(getApplicationContext(), "converter failure", Toast.LENGTH_SHORT);
+                        toast.show();
                     }
+                    mService.write(data);
+                } else {
+                    return;
                 }
             });
             builder.setCancelable(false);
             builder.show();
         }
 
+    }
+
+    private byte[] prepareSendData(Device device) throws IOException {
+        DeviceData deviceData = new DeviceData();
+        Map<String, String> props = new HashMap<>();
+        props.put("ledNum", device.getLedNum().toString());
+        props.put("brightness", device.getBrightness().toString());
+        List<File> images = device.getImageList();
+        Integer height = device.getLedNum() * 144;
+        Integer width = height * 2;
+        for (int i = 0; i < images.size(); i++) {
+            images.set(i, ImageUtils.resizeImageAndConvertToFile(images.get(0), width, height));
+        }
+        deviceData.setImages(images);
+        deviceData.setProps(props);
+        return new DeviceDataConverter(getFilesDir().getPath()).deviceDataToBytes(deviceData);
     }
 
     @Override
@@ -252,7 +266,8 @@ public class MainActivity extends AppCompatActivity implements BluetoothService.
                     FileUtils.copyFile(image.getPath(), location);
                     cachedImages.add(new File(location));
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    Toast toast = Toast.makeText(getApplicationContext(), "storage failure", Toast.LENGTH_SHORT);
+                    toast.show();
                 }
             });
             device.addToImageList(cachedImages);

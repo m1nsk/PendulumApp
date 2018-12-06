@@ -1,5 +1,6 @@
 package com.github.douglasjunior.bluetoothsample.device;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -36,7 +37,7 @@ public class DeviceDataConverter {
         this.storageFolder = storageFolder;
     }
 
-    public byte[] deviceDataToBytes(DeviceData deviceData) throws Exception {
+    public byte[] deviceDataToBytes(DeviceData deviceData) throws JsonProcessingException {
         List<byte[]> images = deviceData
                 .getImages()
                 .stream()
