@@ -1,10 +1,11 @@
-package com.github.douglasjunior.bluetoothsample.device;
+package com.github.douglasjunior.bluetoothsample.Protocol;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import com.github.douglasjunior.bluetoothsample.device.DeviceData;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -30,7 +31,6 @@ import lombok.Setter;
 
 public class DeviceDataConverter {
     private ObjectMapper objectMapper = new ObjectMapper();
-    private final String DATA = "DAT";
     private final String storageFolder;
 
     public DeviceDataConverter(String storageFolder) {
@@ -41,7 +41,7 @@ public class DeviceDataConverter {
         List<byte[]> images = deviceData
                 .getImages()
                 .stream()
-                .map(this::fileToArray)
+                .map(DeviceDataConverter::fileToArray)
                 .collect(Collectors.toList());
         byte[] imageBundle = concatArrays(images);
 
@@ -53,7 +53,7 @@ public class DeviceDataConverter {
         ObjectWriter writer = objectMapper.writer(new DefaultPrettyPrinter());
         byte[] dataInfo = writer.writeValueAsBytes(bundleMap);
 
-        String header = DATA + ":" + dataInfo.length + ":" + imageBundle.length + ":" + Long.BYTES + '\n';
+        String header = DataType.COMMAND + ":" + dataInfo.length + ":" + imageBundle.length + ":" + Long.BYTES + '\n';
 
         byte[] data = concatArrays(Arrays.asList(header.getBytes(), dataInfo, imageBundle));
         CRC32 crc32 = new CRC32();
@@ -73,6 +73,18 @@ public class DeviceDataConverter {
         return imageInfoHolders;
     }
 
+    public BundleInfo getBundleInfo(byte[] bytes) throws Exception {
+        BufferedReader br = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(bytes)));
+        String paramsString = br.readLine();
+        List<String> params = Arrays.asList(paramsString.split(":"));
+        DataType dataType = DataType.getTypeByString(params.get(0));
+        Integer infoBundleSize = tryParseInt(params.get(1));
+        Integer imageBungleSize = tryParseInt(params.get(2));
+        Integer crcSize = tryParseInt(params.get(3));
+        Integer bundleSize = paramsString.getBytes().length + infoBundleSize + imageBungleSize +  crcSize + 1;
+        return new BundleInfo(bundleSize, infoBundleSize, imageBungleSize, crcSize, dataType);
+    }
+
     public DeviceData bytesToDeviceData(byte[] bytes) throws IOException {
         DeviceData deviceData = new DeviceData();
         if(checkCRC(bytes)) {
@@ -80,9 +92,10 @@ public class DeviceDataConverter {
 
             String paramsString = br.readLine();
             List<Integer> params = Arrays.stream(paramsString.split(":"))
-                    .map(this::tryParseInt)
+                    .map(DeviceDataConverter::tryParseInt)
                     .filter(Objects::nonNull)
                     .collect(Collectors.toList());
+            Integer fullSize = params.stream().mapToInt(param -> param).sum() + paramsString.getBytes().length;
             Integer offset = paramsString.getBytes().length;
 
             Map<String, Object> bundle = getBundle(bytes, params, offset);
@@ -115,18 +128,18 @@ public class DeviceDataConverter {
         return images;
     }
 
-    private void saveBytesToFile(File file, byte[] imageBytes) throws IOException {
+    private static void saveBytesToFile(File file, byte[] imageBytes) throws IOException {
         FileOutputStream fos=new FileOutputStream(file);
         fos.write(imageBytes);
         fos.close();
     }
 
-    private void setProps(DeviceData deviceData, Map<String, Object> bundle) {
+    private static void setProps(DeviceData deviceData, Map<String, Object> bundle) {
         Map<String, String> props = (HashMap) bundle.get("props");
         deviceData.setProps(props);
     }
 
-    private boolean checkCRC(byte[] bytes) {
+    private static boolean checkCRC(byte[] bytes) {
         CRC32 crc32 = new CRC32();
         byte[] crcBytes = new byte[Long.BYTES];
         System.arraycopy(bytes, bytes.length - crcBytes.length, crcBytes, 0 , crcBytes.length);
@@ -140,7 +153,7 @@ public class DeviceDataConverter {
         return objectMapper.readValue(infoBytes, new TypeReference<Map<String,Object>>(){});
     }
 
-    private byte[] fileToArray(File file) {
+    private static byte[] fileToArray(File file) {
         byte[] data = new byte[(int) file.length()];
         try {
             new FileInputStream(file).read(data);
@@ -150,26 +163,26 @@ public class DeviceDataConverter {
         return data;
     }
 
-    private byte[] concatArrays(List<byte[]> list) {
+    private static byte[] concatArrays(List<byte[]> list) {
         ByteBuffer bb = ByteBuffer.allocate(list.stream().mapToInt(image -> image.length).sum());
         list.forEach(bb::put);
         return bb.array();
     }
 
-    private byte[] longToBytes(long x) {
+    private static byte[] longToBytes(long x) {
         ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
         buffer.putLong(x);
         return buffer.array();
     }
 
-    private long bytesToLong(byte[] bytes) {
+    private static long bytesToLong(byte[] bytes) {
         ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
         buffer.put(bytes);
         buffer.flip();
         return buffer.getLong();
     }
 
-    private Integer tryParseInt(String value) {
+    private static Integer tryParseInt(String value) {
         try {
             return Integer.parseInt(value);
         } catch (NumberFormatException e) {

@@ -46,10 +46,9 @@ import com.esafirm.imagepicker.model.Image;
 import com.github.douglasjunior.bluetoothclassiclibrary.BluetoothDeviceDecorator;
 import com.github.douglasjunior.bluetoothclassiclibrary.BluetoothService;
 import com.github.douglasjunior.bluetoothclassiclibrary.BluetoothStatus;
-import com.github.douglasjunior.bluetoothsample.ImageUtils.ImageUtils;
+import com.github.douglasjunior.bluetoothsample.Protocol.DeviceDataConverter;
 import com.github.douglasjunior.bluetoothsample.device.Device;
 import com.github.douglasjunior.bluetoothsample.device.DeviceData;
-import com.github.douglasjunior.bluetoothsample.device.DeviceDataConverter;
 import com.yalantis.ucrop.util.FileUtils;
 
 import java.io.File;
@@ -194,11 +193,11 @@ public class MainActivity extends AppCompatActivity implements BluetoothService.
         Toast.makeText(this, status.toString(), Toast.LENGTH_SHORT).show();
 
         if (status == BluetoothStatus.CONNECTED) {
-            CharSequence colors[] = new CharSequence[]{"Synchronize"};
+            CharSequence actions[] = new CharSequence[]{"Synchronize", "Cancel"};
 
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("Select");
-            builder.setItems(colors, (dialog, which) -> {
+            builder.setItems(actions, (dialog, which) -> {
                 if (which == 0) {
                     byte[] data = new byte[0];
                     try {
@@ -226,9 +225,9 @@ public class MainActivity extends AppCompatActivity implements BluetoothService.
         List<File> images = device.getImageList();
         Integer height = device.getLedNum() * 144;
         Integer width = height * 2;
-        for (int i = 0; i < images.size(); i++) {
-            images.set(i, ImageUtils.resizeImageAndConvertToFile(images.get(0), width, height));
-        }
+//        for (int i = 0; i < images.size(); i++) {
+//            images.set(i, ImageUtils.resizeImageAndConvertToFile(images.get(0), width, height));
+//        }
         deviceData.setImages(images);
         deviceData.setProps(props);
         return new DeviceDataConverter(getFilesDir().getPath()).deviceDataToBytes(deviceData);
