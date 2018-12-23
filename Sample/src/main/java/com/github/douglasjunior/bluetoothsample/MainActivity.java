@@ -66,6 +66,7 @@ public class MainActivity extends AppCompatActivity implements BluetoothService.
     private ArrayList<Image> images = new ArrayList<>();
     private ProgressBar pgBar;
     private Button ipBtn;
+    private Button galleryBtn;
     private Menu mMenu;
     private RecyclerView mRecyclerView;
     private DeviceItemAdapter mAdapter;
@@ -90,9 +91,9 @@ public class MainActivity extends AppCompatActivity implements BluetoothService.
         ipBtn.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, PropertiesActivity.class)));
         ipBtn.setVisibility(View.VISIBLE);
 
-        ipBtn = (Button) findViewById(R.id.gallery_btn);
-        ipBtn.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, GalleryActivity.class)));
-        ipBtn.setVisibility(View.VISIBLE);
+        galleryBtn = (Button) findViewById(R.id.gallery_btn);
+        galleryBtn.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, GalleryActivity.class)));
+        galleryBtn.setVisibility(View.VISIBLE);
 
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
@@ -193,7 +194,7 @@ public class MainActivity extends AppCompatActivity implements BluetoothService.
         Toast.makeText(this, status.toString(), Toast.LENGTH_SHORT).show();
 
         if (status == BluetoothStatus.CONNECTED) {
-            CharSequence actions[] = new CharSequence[]{"Synchronize", "Cancel"};
+            CharSequence actions[] = new CharSequence[]{"Synchronize", "Command", "Cancel"};
 
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("Select");
@@ -207,6 +208,8 @@ public class MainActivity extends AppCompatActivity implements BluetoothService.
                         toast.show();
                     }
                     mService.write(data);
+                } else if (which == 1) {
+                    startActivity(new Intent(MainActivity.this, CommandActivity.class));
                 } else {
                     return;
                 }

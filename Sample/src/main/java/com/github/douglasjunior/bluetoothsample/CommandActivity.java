@@ -35,6 +35,9 @@ import android.widget.Toast;
 
 import com.esafirm.imagepicker.features.ImagePicker;
 import com.esafirm.imagepicker.model.Image;
+import com.github.douglasjunior.bluetoothclassiclibrary.BluetoothService;
+import com.github.douglasjunior.bluetoothclassiclibrary.BluetoothStatus;
+import com.github.douglasjunior.bluetoothclassiclibrary.BluetoothWriter;
 import com.github.douglasjunior.bluetoothsample.device.Device;
 import com.github.douglasjunior.bluetoothsample.helper.OnStartDragListener;
 import com.github.douglasjunior.bluetoothsample.helper.SimpleItemTouchHelperCallback;
@@ -45,12 +48,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GalleryActivity extends AppCompatActivity implements OnStartDragListener {
+public class CommandActivity extends AppCompatActivity implements BluetoothService.OnBluetoothEventCallback {
     private List<File> imgList;
-    private ItemTouchHelper mItemTouchHelper;
-    private GalleryAdapter adapter;
+    private CommandAdapter adapter;
     private RecyclerView recyclerView;
-    private Button addImagesBtn;
+    private BluetoothService mService;
+    private BluetoothWriter mWriter;
 
     private Device device;
 
@@ -68,67 +71,53 @@ public class GalleryActivity extends AppCompatActivity implements OnStartDragLis
         final int spanCount = 2;
         final GridLayoutManager layoutManager = new GridLayoutManager(getApplicationContext(), spanCount);
         recyclerView.setLayoutManager(layoutManager);
-        adapter = new GalleryAdapter(getApplicationContext(), imgList, this, GalleryActivity.this);
+        adapter = new CommandAdapter(getApplicationContext(), imgList, CommandActivity.this);
         recyclerView.setAdapter(adapter);
 
-        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(adapter);
-        mItemTouchHelper = new ItemTouchHelper(callback);
-        mItemTouchHelper.attachToRecyclerView(recyclerView);
-
-        addImagesBtn = (Button) findViewById(R.id.btn_add_images);
-        addImagesBtn.setOnClickListener(v -> start());
-    }
-
-    public void start() {
-        ImagePicker.create(this)
-                .folderMode(true)
-                .limit(15)
-                .showCamera(false)
-                .start();
+        mService = BluetoothService.getDefaultInstance();
+        mWriter = new BluetoothWriter(mService);
     }
 
     @Override
-    public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
-        mItemTouchHelper.startDrag(viewHolder);
-    }
-
-    @Override
-    public void onRemove(RecyclerView.ViewHolder viewHolder) {
-        viewHolder.getItemId();
+    protected void onResume() {
+        super.onResume();
+        mService.setOnEventCallback(this);
     }
 
     @Override
     protected void onActivityResult(int requestCode, final int resultCode, Intent data) {
-        if (ImagePicker.shouldHandle(requestCode, resultCode, data)) {
-            ArrayList<Image> images = (ArrayList<Image>) ImagePicker.getImages(data);
-            List<File> cachedImages = new ArrayList<>();
-
-            images.forEach(image -> {
-                try {
-                    String location = getCacheDir().getPath() + image.getName();
-                    FileUtils.copyFile(image.getPath(), location);
-                    cachedImages.add(new File(location));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            });
-            device.addToImageList(cachedImages);
-        }
-        recyclerView.setAdapter(adapter);
         super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        device.setImageList(imgList);
-        try {
-            device.saveToStorage();
-        } catch (IOException e) {
-            Toast toast = Toast.makeText(getApplicationContext(), "storage failure", Toast.LENGTH_SHORT);
-            toast.show();
-        }
+        mService.disconnect();
     }
 
 
+    @Override
+    public void onDataRead(byte[] bytes, int i) {
+
+    }
+
+    @Override
+    public void onStatusChange(BluetoothStatus bluetoothStatus) {
+
+    }
+
+    @Override
+    public void onDeviceName(String s) {
+
+    }
+
+    @Override
+    public void onToast(String s) {
+
+    }
+
+    @Override
+    public void onDataWrite(byte[] bytes) {
+
+    }
 }
