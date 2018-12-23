@@ -12,23 +12,30 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.github.douglasjunior.bluetoothsample.helper.ItemTouchHelperAdapter;
-import com.github.douglasjunior.bluetoothsample.helper.OnStartDragListener;
-import com.yalantis.ucrop.UCrop;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.github.douglasjunior.bluetoothclassiclibrary.BluetoothService;
+import com.github.douglasjunior.bluetoothsample.Protocol.Command;
+import com.github.douglasjunior.bluetoothsample.Protocol.CommandType;
+import com.github.douglasjunior.bluetoothsample.Protocol.DeviceCommandConverter;
 
 import java.io.File;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class CommandAdapter extends RecyclerView.Adapter<CommandAdapter.ViewHolder> {
     private List<File> galleryList;
     private Activity activity;
     private Context context;
+    private BluetoothService bluetoothService;
+    private static DeviceCommandConverter deviceCommandConverter = new DeviceCommandConverter();
 
-    public CommandAdapter(Context context, List<File> galleryList, Activity activity) {
+    public CommandAdapter(Context context, List<File> galleryList, Activity activity, BluetoothService bluetoothService) {
         this.galleryList = galleryList;
         this.activity = activity;
         this.context = context;
+        this.bluetoothService = bluetoothService;
     }
 
     @Override
@@ -50,9 +57,17 @@ public class CommandAdapter extends RecyclerView.Adapter<CommandAdapter.ViewHold
             builder.setTitle("Select");
             builder.setItems(colors, (dialog, which) -> {
                 if (which == 0) {
-                    Toast toast = Toast.makeText(context,
-                            name, Toast.LENGTH_SHORT);
-                    toast.show();
+                    try {
+                        Command command = new Command();
+                        command.setType(CommandType.IMAGE);
+                        Map<String, String> map = new HashMap<>();
+                        map.put("name", name);
+                        command.setArgs(map);
+                        this.bluetoothService.write(deviceCommandConverter.deviceCommandToBytes(command));
+                    } catch (JsonProcessingException e) {
+                        Toast toast = Toast.makeText(this.context ,e.getMessage(), Toast.LENGTH_SHORT);
+                        toast.show();
+                    }
                 } else {
                     return;
                 }

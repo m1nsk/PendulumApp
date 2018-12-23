@@ -25,7 +25,6 @@ import java.util.zip.CRC32;
 
 import lombok.Getter;
 import lombok.Setter;
-import transmission.device.DeviceData;
 
 public class DeviceDataConverter {
     private ObjectMapper objectMapper = new ObjectMapper();

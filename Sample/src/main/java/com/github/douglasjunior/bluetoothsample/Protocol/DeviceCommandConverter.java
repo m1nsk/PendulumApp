@@ -30,7 +30,7 @@ public class DeviceCommandConverter {
         ObjectWriter writer = objectMapper.writer(new DefaultPrettyPrinter());
         byte[] body = writer.writeValueAsBytes(bundleMap);
 
-        String header = DataType.DATA + ":" + body.length + ":" + Long.BYTES + '\n';
+        String header = DataType.COMMAND + ":" + body.length + ":" + Long.BYTES + '\n';
 
         byte[] data = ConvertorUtils.concatArrays(Arrays.asList(header.getBytes(), body));
         CRC32 crc32 = new CRC32();

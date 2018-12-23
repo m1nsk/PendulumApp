@@ -63,19 +63,19 @@ public class CommandActivity extends AppCompatActivity implements BluetoothServi
         device = Device.getInstance();
         imgList = device.getImageList();
 
-        setContentView(R.layout.activity_gallery);
+        setContentView(R.layout.activity_command);
 
         recyclerView = (RecyclerView)findViewById(R.id.imagegallery);
         recyclerView.setHasFixedSize(true);
 
+        mService = BluetoothService.getDefaultInstance();
+        mWriter = new BluetoothWriter(mService);
+
         final int spanCount = 2;
         final GridLayoutManager layoutManager = new GridLayoutManager(getApplicationContext(), spanCount);
         recyclerView.setLayoutManager(layoutManager);
-        adapter = new CommandAdapter(getApplicationContext(), imgList, CommandActivity.this);
+        adapter = new CommandAdapter(getApplicationContext(), imgList, CommandActivity.this, mService);
         recyclerView.setAdapter(adapter);
-
-        mService = BluetoothService.getDefaultInstance();
-        mWriter = new BluetoothWriter(mService);
     }
 
     @Override

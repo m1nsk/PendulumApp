@@ -233,7 +233,7 @@ public class MainActivity extends AppCompatActivity implements BluetoothService.
 //        }
         deviceData.setImages(images);
         deviceData.setProps(props);
-        return new DeviceDataConverter(getFilesDir().getPath()).deviceDataToBytes(deviceData);
+        return new DeviceDataConverter(getFilesDir()).deviceDataToBytes(deviceData);
     }
 
     @Override
