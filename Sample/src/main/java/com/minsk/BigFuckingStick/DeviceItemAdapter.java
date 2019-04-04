@@ -34,7 +34,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.github.douglasjunior.bluetoothclassiclibrary.BluetoothDeviceDecorator;
-import com.github.douglasjunior.bluetoothsample.R;
 
 import java.util.ArrayList;
 import java.util.Collection;

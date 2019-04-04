@@ -33,7 +33,6 @@ import android.support.v7.widget.RecyclerView;
 import com.github.douglasjunior.bluetoothclassiclibrary.BluetoothService;
 import com.github.douglasjunior.bluetoothclassiclibrary.BluetoothStatus;
 import com.github.douglasjunior.bluetoothclassiclibrary.BluetoothWriter;
-import com.github.douglasjunior.bluetoothsample.R;
 import com.minsk.BigFuckingStick.device.Device;
 
 import java.io.File;

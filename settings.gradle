@@ -1,1 +1,1 @@
-include ':BluetoothLowEnergyLibrary', ':BluetoothClassicLibrary', ':Sample'
+include ':Sample'

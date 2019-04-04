@@ -22,7 +22,6 @@ import com.esafirm.imagepicker.model.Image;
 import com.github.douglasjunior.bluetoothclassiclibrary.BluetoothDeviceDecorator;
 import com.github.douglasjunior.bluetoothclassiclibrary.BluetoothService;
 import com.github.douglasjunior.bluetoothclassiclibrary.BluetoothStatus;
-import com.github.douglasjunior.bluetoothsample.R;
 import com.minsk.BigFuckingStick.Protocol.DeviceDataConverter;
 import com.minsk.BigFuckingStick.device.Device;
 import com.minsk.BigFuckingStick.device.DeviceData;
@@ -87,13 +86,9 @@ public class MainActivity extends AppCompatActivity implements BluetoothService.
         mService.setOnScanCallback(this);
         mService.setOnEventCallback(this);
 
-        try {
-            device = Device.getInstance();
-            device.setStorage(getFilesDir());
-        } catch (IOException e) {
-            Toast toast = Toast.makeText(getApplicationContext(), "storage failure", Toast.LENGTH_SHORT);
-            toast.show();
-        }
+        device = Device.getInstance();
+        device.setStorage(getFilesDir());
+
     }
 
     @Override

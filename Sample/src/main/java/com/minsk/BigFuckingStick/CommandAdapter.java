@@ -14,7 +14,6 @@ import android.widget.Toast;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.douglasjunior.bluetoothclassiclibrary.BluetoothService;
-import com.github.douglasjunior.bluetoothsample.R;
 import com.minsk.BigFuckingStick.Protocol.Command;
 import com.minsk.BigFuckingStick.Protocol.CommandType;
 import com.minsk.BigFuckingStick.Protocol.DeviceCommandConverter;

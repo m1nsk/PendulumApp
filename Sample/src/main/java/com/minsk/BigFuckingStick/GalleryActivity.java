@@ -35,7 +35,6 @@ import android.widget.Toast;
 
 import com.esafirm.imagepicker.features.ImagePicker;
 import com.esafirm.imagepicker.model.Image;
-import com.github.douglasjunior.bluetoothsample.R;
 import com.minsk.BigFuckingStick.device.Device;
 import com.minsk.BigFuckingStick.helper.OnStartDragListener;
 import com.minsk.BigFuckingStick.helper.SimpleItemTouchHelperCallback;

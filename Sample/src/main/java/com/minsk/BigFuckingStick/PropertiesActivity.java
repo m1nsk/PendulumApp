@@ -30,7 +30,6 @@ import android.widget.TextView;
 import android.widget.SeekBar;
 import android.widget.Toast;
 
-import com.github.douglasjunior.bluetoothsample.R;
 import com.minsk.BigFuckingStick.device.Device;
 
 import java.io.IOException;

@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
 
-        applicationId "com.github.douglasjunior.bluetoothsample1"
+        applicationId "com.minsk.pendulum"
         minSdkVersion 25
         targetSdkVersion 27
         versionCode 1
