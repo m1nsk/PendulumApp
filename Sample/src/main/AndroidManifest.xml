@@ -10,12 +10,12 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
     <application
-        android:name=".SampleApplication"
+        android:name="com.minsk.BigFuckingStick.SampleApplication"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme.NoActionBar">
         <activity
-            android:name=".MainActivity"
+            android:name="com.minsk.BigFuckingStick.MainActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -26,19 +26,19 @@
         </activity>
 
         <activity
-            android:name=".GalleryActivity"
+            android:name="com.minsk.BigFuckingStick.GalleryActivity"
             android:label="Gallery"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
 
         <activity
-            android:name=".PropertiesActivity"
+            android:name="com.minsk.BigFuckingStick.PropertiesActivity"
             android:label="Properties"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
 
         <activity
-            android:name=".CommandActivity"
+            android:name="com.minsk.BigFuckingStick.CommandActivity"
             android:label="Properties"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
